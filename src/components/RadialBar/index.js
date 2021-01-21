@@ -1,17 +1,37 @@
 import { useEffect } from "react";
 import { Chart } from "@antv/g2";
+import classnames from "classnames";
+import styles from "./index.module.css";
 
-const initChart = () => {
-  const data = [
-    { term: "test3", count: 9, max: 100 },
-    { term: "test2", count: 8, max: 100 },
-    { term: "test1", count: 8, max: 100 },
-  ];
+const defaultData = [
+  { term: "test3", count: 9, max: 100 },
+  { term: "test2", count: 8, max: 100 },
+  { term: "test1", count: 8, max: 100 },
+];
 
+const defaultColors = {
+  test1: {
+    backgroundColor: "rgba(104,233,252,.5)",
+    foregroundColor: "rgb(104,233,252)",
+  },
+  test2: {
+    backgroundColor: "rgba(37,85,235,.5)",
+    foregroundColor: "rgb(37,85,235)",
+  },
+  test3: {
+    backgroundColor: "rgba(238,168,74,.5)",
+    foregroundColor: "rgb(238,168,74)",
+  },
+};
+
+const initChart = ({
+  data = defaultData,
+  colors = defaultColors,
+  lineWidth = 10,
+}) => {
   const chart = new Chart({
     container: "container",
     autoFit: true,
-    height: 500,
     padding: 50,
   });
 
@@ -26,6 +46,8 @@ const initChart = () => {
     grid: null,
     line: null,
   });
+
+  chart.legend(false);
 
   chart.scale({
     max: {
@@ -47,17 +69,10 @@ const initChart = () => {
     .position("term*max")
     .shape("line")
     .color("term", (term) => {
-      switch (term) {
-        case "test1":
-          return "rgba(104,233,252,.5)";
-        case "test2":
-          return "rgba(37,85,235,.5)";
-        case "test3":
-          return "rgba(238,168,74,.5)";
-      }
+      return colors[term].backgroundColor;
     })
     .style({
-      lineWidth: 10,
+      lineWidth,
       lineCap: "round",
     }); // 线状柱状图
 
@@ -66,40 +81,43 @@ const initChart = () => {
     .position("term*count")
     .shape("line")
     .color("term", (term) => {
-      switch (term) {
-        case "test1":
-          return "rgb(104,233,252)";
-        case "test2":
-          return "rgb(37,85,235)";
-        case "test3":
-          return "rgb(238,168,74)";
-      }
+      return colors[term].foregroundColor;
     })
     .style({
-      lineWidth: 10,
+      lineWidth,
       lineCap: "round",
     }); // 线状柱状图
-
-  chart.annotation().text({
-    position: ["50%", "50%"],
-    style: {
-      textAlign: "center",
-      fontSize: 24,
-    },
-  });
 
   chart.render();
   return chart;
 };
 
-function App() {
+/**
+ * 
+ * @param {String} props.className 容器的 className ，默认 width: 400px;height: 400px;
+ * @param {Array} props.data 图表数据，Array Item 参考： { term: "test3", count: 9, max: 100 }
+ * @param {Object} props.colors 指定 Array Item 对应颜色，参考：
+ * {
+    test1: {
+      backgroundColor: "rgba(104,233,252,.5)",
+      foregroundColor: "rgb(104,233,252)",
+    }
+  };
+ * @param {Number} props.lineWidth 描述线段宽度的数字。 0、 负数、 Infinity 和 NaN 会被忽略。参考：https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/lineWidth
+ */
+function RadialBar(props) {
+  const containerClass = classnames({
+    [styles.container]: true,
+    [props.className]: props.className,
+  });
+  // CDM
   useEffect(() => {
-    const chart = initChart();
+    const chart = initChart(props);
     return () => {
       chart.destroy();
     };
   });
-  return <div id="container" className="container"></div>;
+  return <div id="container" className={containerClass}></div>;
 }
 
-export default App;
+export default RadialBar;
