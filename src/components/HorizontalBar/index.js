@@ -14,10 +14,12 @@ const initChart = ({
   data = defaultData,
   axisColor = "#20424C",
   barColors = ["#69E9FC", "#2555EB"],
+  padding = [8, 128, 64, 96],
 }) => {
   const chart = new Chart({
     container: "container",
     autoFit: true,
+    padding,
   });
   chart.data(data);
   chart.scale({
